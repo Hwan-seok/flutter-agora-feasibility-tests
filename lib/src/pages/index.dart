@@ -31,7 +31,7 @@ class IndexState extends State<IndexPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Agora Flutter QuickStart'),
+        title: Text('내맘대로 라이브캠 시작해볼까요?'),
       ),
       body: Center(
         child: Container(

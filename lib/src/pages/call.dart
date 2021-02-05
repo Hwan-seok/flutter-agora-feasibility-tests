@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:agora_flutter_quickstart/src/controller/beautify.controller.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:agora_rtc_engine/rtc_local_view.dart' as RtcLocalView;
 import 'package:agora_rtc_engine/rtc_remote_view.dart' as RtcRemoteView;
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../utils/settings.dart';
 
@@ -25,7 +27,10 @@ class _CallPageState extends State<CallPage> {
   final _users = <int>[];
   final _infoStrings = <String>[];
   bool muted = false;
+  bool beautified = false;
   RtcEngine _engine;
+
+  BeautifyController controller = Get.put(BeautifyController());
 
   @override
   void dispose() {
@@ -67,6 +72,7 @@ class _CallPageState extends State<CallPage> {
   /// Create agora sdk instance and initialize
   Future<void> _initAgoraRtcEngine() async {
     _engine = await RtcEngine.create(APP_ID);
+    controller.engine = _engine;
     await _engine.enableVideo();
     await _engine.setChannelProfile(ChannelProfile.LiveBroadcasting);
     await _engine.setClientRole(widget.role);
@@ -184,6 +190,18 @@ class _CallPageState extends State<CallPage> {
           RawMaterialButton(
             onPressed: _onToggleMute,
             child: Icon(
+              muted ? Icons.pregnant_woman : Icons.upgrade_sharp,
+              color: beautified ? Colors.white : Colors.blueAccent,
+              size: 20.0,
+            ),
+            shape: CircleBorder(),
+            elevation: 2.0,
+            fillColor: muted ? Colors.blueAccent : Colors.white,
+            padding: const EdgeInsets.all(12.0),
+          ),
+          RawMaterialButton(
+            onPressed: _onToggleMute,
+            child: Icon(
               muted ? Icons.mic_off : Icons.mic,
               color: muted ? Colors.white : Colors.blueAccent,
               size: 20.0,
@@ -291,7 +309,7 @@ class _CallPageState extends State<CallPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Agora Flutter QuickStart'),
+        title: Text('강환석의 내맘대로 라이브캠'),
       ),
       backgroundColor: Colors.black,
       body: Center(
@@ -300,6 +318,61 @@ class _CallPageState extends State<CallPage> {
             _viewRows(),
             _panel(),
             _toolbar(),
+            Obx(() => Column(
+                  children: [
+                    Row(
+                      children: [
+                        Switch(
+                          value: controller.beautified.value,
+                          onChanged: (value) =>
+                              controller.beautified.value = value,
+                        ),
+                        RawMaterialButton(
+                          onPressed: () => controller.lighteningContrastLevel
+                              .value = LighteningContrastLevel.Low,
+                          child: Text("1"),
+                          shape: CircleBorder(),
+                          elevation: 2.0,
+                          fillColor: Colors.yellow,
+                          padding: const EdgeInsets.all(15.0),
+                        ),
+                        RawMaterialButton(
+                          onPressed: () => controller.lighteningContrastLevel
+                              .value = LighteningContrastLevel.Normal,
+                          child: Text("2"),
+                          shape: CircleBorder(),
+                          elevation: 2.0,
+                          fillColor: Colors.blue,
+                          padding: const EdgeInsets.all(15.0),
+                        ),
+                        RawMaterialButton(
+                          onPressed: () => controller.lighteningContrastLevel
+                              .value = LighteningContrastLevel.High,
+                          child: Text("3"),
+                          shape: CircleBorder(),
+                          elevation: 2.0,
+                          fillColor: Colors.red,
+                          padding: const EdgeInsets.all(15.0),
+                        ),
+                      ],
+                    ),
+                    Slider(
+                      value: controller.lighteningLevel.value,
+                      onChanged: (value) =>
+                          controller.lighteningLevel.value = value,
+                    ),
+                    Slider(
+                      value: controller.smoothnessLevel.value,
+                      onChanged: (value) =>
+                          controller.smoothnessLevel.value = value,
+                    ),
+                    Slider(
+                      value: controller.rednessLevel.value,
+                      onChanged: (value) =>
+                          controller.rednessLevel.value = value,
+                    ),
+                  ],
+                ))
           ],
         ),
       ),
